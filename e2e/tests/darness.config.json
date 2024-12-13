@@ -1,0 +1,14 @@
+{
+    "example": {
+        "image": "debian",
+        "commands": [
+            ["sh", "-c" , "echo \"Hello, World!\" >> /tmp/hello.txt"]
+        ],
+        "description": "This is an example of a simple container that installs updates and writes a file.",
+        "artifacts": [{
+            "name": "hello.txt",
+            "location": "/tmp/hello.txt",
+            "comparisonLocation": "./examples/hello.txt"
+        }]
+    }
+}

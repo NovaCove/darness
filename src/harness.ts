@@ -54,7 +54,7 @@ export class Harness {
             AttachStdout: true,
             AttachStderr: true,
             Tty: true,
-            platform: 'linux/arm64',
+            // platform: 'linux/arm64',
             Entrypoint: ['/bin/sh'],
         });
         console.log(`Created container: ${container.id}`);
