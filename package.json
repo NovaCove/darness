@@ -2,7 +2,10 @@
   "name": "darness",
   "version": "0.0.0",
   "description": "Docker based testing harness",
-  "main": "dist/main.js",
+  "bin": {
+    "darness": "dist/main.js"
+  },
+  "main": "dist/index.js",
   "scripts": {
     "test": "vitest",
     "build": "tsc -p tsconfig.bin.json"
