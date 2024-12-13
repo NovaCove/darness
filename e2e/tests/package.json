@@ -9,6 +9,6 @@
   "author": "Trey Tacon <ttacon@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "darness": "^1.0.1"
+    "darness": "^1.0.3"
   }
 }

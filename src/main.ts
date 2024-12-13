@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Harness } from '.';
 
 const harness = new Harness();
