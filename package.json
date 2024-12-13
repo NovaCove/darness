@@ -1,0 +1,38 @@
+{
+  "name": "darness",
+  "version": "0.0.0",
+  "description": "Docker based testing harness",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "build": "tsc -p tsconfig.bin.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/novacove/darness.git"
+  },
+  "keywords": [
+    "Docker",
+    "testing",
+    "harness"
+  ],
+  "author": "Trey Tacon <ttacon@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/novacove/darness/issues"
+  },
+  "homepage": "https://github.com/novacove/darness#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@tsconfig/node22": "^22.0.0",
+    "@types/dockerode": "^3.3.32",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "dockerode": "^4.0.2",
+    "tar": "^7.4.3"
+  }
+}
