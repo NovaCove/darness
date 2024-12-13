@@ -1,4 +1,4 @@
-import { Harness } from '../src';
+import { Harness } from '.';
 
 const harness = new Harness();
 harness.runScenarios().then(() => {
