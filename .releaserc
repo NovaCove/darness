@@ -1,0 +1,6 @@
+{
+  branches: [
+    { name: "main" },
+    { name: "exp-*", channel: "alpha", prerelease: "alpha" }
+  ]
+}
