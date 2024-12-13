@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/novacove/darness.git"
+    "url": "git+https://github.com/NovaCove/darness.git"
   },
   "keywords": [
     "Docker",
