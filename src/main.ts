@@ -2,15 +2,22 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 
+import { join } from 'node:path';
+
 import { Command } from 'commander';
 
 import { Harness } from '.';
+
+const version = JSON.parse(readFileSync(
+    join(__dirname, '..', './package.json'),
+    'utf8',
+))?.version;
 
 const program = new Command();
 program
     .name('darness')
     .description('Run scenarios in Docker containers.')
-    .version('0.1.0');
+    .version(version);
 
 async function runScenarios(harness: Harness, scenarioNames: string[] = []) {
     await harness.runScenarios(scenarioNames);
