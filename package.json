@@ -38,7 +38,9 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
+    "commander": "^13.1.0",
     "dockerode": "^4.0.2",
-    "tar": "^7.4.3"
+    "tar": "^7.4.3",
+    "zod": "^3.24.2"
   }
 }
