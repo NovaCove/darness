@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import * as tar from 'tar';
 
 
-import Docker, { type DockerOptions } from 'dockerode';
-import { type Scenario, loadScenariosFromFile, scenarioCollectionValidator } from './scenario';
+import Docker, { Container, type DockerOptions } from 'dockerode';
+import { type Scenario, ScenarioArtifact, loadScenariosFromFile, scenarioCollectionValidator } from './scenario';
 
 const DEFAULT_CONFIG_FILE_LOCATION = './darness.config.json';
 
@@ -119,46 +119,10 @@ export class Harness {
 
         // Collect artifacts.
         for (const artifact of scenario.artifacts) {
-            const containerPath = artifact.location;
-            const hostPath = artifact.comparisonLocation;
-            const stream = await container.getArchive({ path: containerPath });
-
-            // Make a temp path to store the file at
-            // so we can compare it to the expected file.
-            const tempDir = await mkdtemp(join(tmpdir(), 'harness-'));
-            const tempPath = `${tempDir}/${artifact.name}`;
-            const tarPath = `${tempDir}/${artifact.name}.tar`;
-
-            console.log(`Saving artifact: ${artifact.name} to ${tempPath}`);
-
-            await new Promise((resolve, reject) => {
-                stream.pipe(fs.createWriteStream(tarPath));
-                stream.on('end', resolve);
-                stream.on('error', reject);
-            });
-
-            // Extract the file from the tarball.
-            await new Promise((resolve, reject) => {
-                console.log(`Extracting artifact: ${artifact.name} to ${tempPath}`);
-                const tarStream = fs.createReadStream(tarPath);
-                tarStream.on('error', reject);
-
-                // DIDNTDO(ttacon): we should support extracting only a single file, 
-                // but it also shouldn't matter since there _should_ only be a single file
-                // in the tarball.
-                tarStream.pipe(tar.extract({
-                    cwd: tempDir,
-                    C: tempDir,
-                })).on('finish', resolve);
-            });
-
-            console.log(`Artifact: ${artifact.name} saved to ${tempPath}`);
-
-            // Compare the file with the expected file.
-            const expected = fs.readFileSync(hostPath, 'utf8');
-            const actual = fs.readFileSync(tempPath, 'utf8');
-            if (expected !== actual) {
-                console.error(`Artifact ${artifact.name} does not match expected contents.`);
+            try {
+                await this.indianaJonesThatTreasure(artifact, container);
+            } catch (err) {
+                console.error(`Failed to collect artifact: ${artifact.name}`, err);
             }
         }
 
@@ -168,6 +132,50 @@ export class Harness {
 
         console.log(`Removing container: ${container.id}`);
         await container.remove({ force: true });
+    }
+
+    async indianaJonesThatTreasure(artifact: ScenarioArtifact, container: Container) {
+        const containerPath = artifact.location;
+        const hostPath = artifact.comparisonLocation;
+        const stream = await container.getArchive({ path: containerPath });
+
+        // Make a temp path to store the file at
+        // so we can compare it to the expected file.
+        const tempDir = await mkdtemp(join(tmpdir(), 'harness-'));
+        const tempPath = `${tempDir}/${artifact.name}`;
+        const tarPath = `${tempDir}/${artifact.name}.tar`;
+
+        console.log(`Saving artifact: ${artifact.name} to ${tempPath}`);
+
+        await new Promise((resolve, reject) => {
+            stream.pipe(fs.createWriteStream(tarPath));
+            stream.on('end', resolve);
+            stream.on('error', reject);
+        });
+
+        // Extract the file from the tarball.
+        await new Promise((resolve, reject) => {
+            console.log(`Extracting artifact: ${artifact.name} to ${tempPath}`);
+            const tarStream = fs.createReadStream(tarPath);
+            tarStream.on('error', reject);
+
+            // DIDNTDO(ttacon): we should support extracting only a single file, 
+            // but it also shouldn't matter since there _should_ only be a single file
+            // in the tarball.
+            tarStream.pipe(tar.extract({
+                cwd: tempDir,
+                C: tempDir,
+            })).on('finish', resolve);
+        });
+
+        console.log(`Artifact: ${artifact.name} saved to ${tempPath}`);
+
+        // Compare the file with the expected file.
+        const expected = fs.readFileSync(hostPath, 'utf8');
+        const actual = fs.readFileSync(tempPath, 'utf8');
+        if (expected !== actual) {
+            console.error(`Artifact ${artifact.name} does not match expected contents.`);
+        }
     }
 
     static validateConfig(config: Record<string, unknown>) {
