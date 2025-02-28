@@ -6,22 +6,33 @@ import { join } from 'node:path';
 import * as tar from 'tar';
 
 
-import Docker from 'dockerode';
-import { type Scenario, loadScenariosFromFile } from './scenario';
+import Docker, { type DockerOptions } from 'dockerode';
+import { type Scenario, loadScenariosFromFile, scenarioCollectionValidator } from './scenario';
 
 const DEFAULT_CONFIG_FILE_LOCATION = './darness.config.json';
 
+export type HarnessConfig = {
+    config: string;
+    daemonSocket?: string;
+};
+
 export class Harness {
     private client: Docker;
+    
 
-    constructor() {
-        // DIDNTDO(ttacon): support parameterization of the client.
-        this.client = new Docker();
+    constructor(private config: HarnessConfig) {
+        let dockerOptions: DockerOptions | undefined = undefined;
+        if (config.daemonSocket) {
+            dockerOptions = {
+                socketPath: config.daemonSocket,
+            };
+        }
+        this.client = new Docker(dockerOptions);
     }
 
     private loadScenarios() {
         try {
-            return loadScenariosFromFile(DEFAULT_CONFIG_FILE_LOCATION);
+            return loadScenariosFromFile(this.config.config);
         } catch (e) {
             console.error('Failed to load scenarios: ', e);
             return {};
@@ -137,5 +148,9 @@ export class Harness {
 
         console.log(`Removing container: ${container.id}`);
         await container.remove({ force: true });
+    }
+
+    static validateConfig(config: Record<string, unknown>) {
+        return scenarioCollectionValidator.safeParse(config).success;
     }
 }
