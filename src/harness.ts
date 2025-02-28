@@ -43,7 +43,6 @@ export class Harness {
         const scenarios = this.loadScenarios();
         for (const scenarioName in scenarios) {
             const scenario = scenarios[scenarioName];
-            console.log(`Running scenario: ${scenarioName}`);
 
             try {
                 await this.runScenario(scenarioName, scenario);
