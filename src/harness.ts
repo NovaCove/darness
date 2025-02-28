@@ -39,8 +39,29 @@ export class Harness {
         }
     }
 
-    async runScenarios() {
+    async listScenarios() {
         const scenarios = this.loadScenarios();
+        if (Object.keys(scenarios).length === 0) {
+            console.log('No scenarios found.');
+            return;
+        }
+
+        console.log('Available scenarios:');
+        for (const scenarioName in scenarios) {
+            const scenario = scenarios[scenarioName];
+            console.log(`- ${scenarioName}: ${scenario.description}`);
+        }
+    }
+
+    async runScenarios(scenarioNames: string[] = []) {
+        let scenarios = this.loadScenarios();
+
+        if (scenarioNames.length > 0) {
+            scenarios = Object.fromEntries(
+                Object.entries(scenarios).filter(([name]) => scenarioNames.includes(name))
+            );
+        }
+
         for (const scenarioName in scenarios) {
             const scenario = scenarios[scenarioName];
 

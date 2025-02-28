@@ -12,8 +12,8 @@ program
     .description('Run scenarios in Docker containers.')
     .version('0.1.0');
 
-async function runScenarios(harness: Harness) {
-    await harness.runScenarios();
+async function runScenarios(harness: Harness, scenarioNames: string[] = []) {
+    await harness.runScenarios(scenarioNames);
 }
 
 program
@@ -21,6 +21,7 @@ program
     .description('Run darness scenarios')
     .option('-c, --config <path>', 'Path to the config file', './darness.config.json')
     .option('-s, --daemon-socket <daemonSocket>', 'Docker daemon socket to connect to')
+    .option('-n, --scenarios <scenarios...>', 'List of scenarios to run', [])
     .action(async (options) => {
         const config = {
             config: options.config,
@@ -34,7 +35,7 @@ program
         }
         const harness = new Harness(config);
         try {
-            await runScenarios(harness);
+            await runScenarios(harness, options.scenarios);
         } catch (e) {
             console.error('Failed to run scenarios: ', e);
             process.exit(1);
@@ -66,6 +67,29 @@ program
             process.exit(1);
         }
         console.log('Config file is valid.');
+        process.exit(0);
+    });
+
+program
+    .command('list')
+    .description('List available scenarios')
+    .option('-c, --config <path>', 'Path to the config file', './darness.config.json')
+    .action(async (options) => {
+        const config = {
+            config: options.config,
+        };
+        // Ensure that the config file exists.
+        if (!existsSync(config.config)) {
+            console.error(`Config file not found: ${config.config}`);
+            process.exit(1);
+        }
+        const harness = new Harness(config);
+        try {
+            await harness.listScenarios();
+        } catch (e) {
+            console.error('Failed to list scenarios: ', e);
+            process.exit(1);
+        }
         process.exit(0);
     });
 
